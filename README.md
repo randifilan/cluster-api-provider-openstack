@@ -29,26 +29,27 @@ export KUBECONFIG=/home/ubuntu/.kube/config
 ```
 
 ### Establishing the Management Control Plane
-Install and/or configure a Kubernetes cluster
+#### Install and/or configure a Kubernetes cluster
 ```
 export KUBECONFIG=/home/ubuntu/.kube/config
 ```
-Install clusterctl Binary:
+#### Install clusterctl Binary:
 ```
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.7.4/clusterctl-linux-amd64 -o clusterctl
 sudo install -o root -g root -m 0755 clusterctl /usr/local/bin/clusterctl
 clusterctl version
 ```
 
-Initialize the Management cluster [Cluster API](https://main.cluster-api.sigs.k8s.io/user/quick-start#initialize-the-management-cluster)
+#### Initialize the Management cluster [Cluster API](https://main.cluster-api.sigs.k8s.io/user/quick-start#initialize-the-management-cluster)
+```
 export CLUSTER_TOPOLOGY=true
 clusterctl init --infrastructure openstack 
+```
+<br/> 
 
-<br/>
+## Build [Image for OpenStack](https://image-builder.sigs.k8s.io/capi/providers/openstack.html#installing-packages-to-use-qemu-img)
 
-# Build [Image for OpenStack](https://image-builder.sigs.k8s.io/capi/providers/openstack.html#installing-packages-to-use-qemu-img)
-
-Install and Configure Necessary package on Image Builder Instance
+### Install and Configure Necessary package on Image Builder Instance
 ```
 sudo apt update && sudo apt upgrade
 sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients virtinst cpu-checker libguestfs-tools libosinfo-bin
@@ -56,20 +57,20 @@ sudo usermod -a -G kvm ubuntu
 sudo chown root:kvm /dev/kvm
 ```
 
-Install [Packer](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli)
+### Install [Packer](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli)
 ```
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 sudo apt-get update && sudo apt-get install packer
 ```
 
-Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+### Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 ```
 sudo apt-add-repository ppa:ansible/ansible
 sudo apt install ansible
 ```
 
-Building [OpenStack Imange Template](https://image-builder.sigs.k8s.io/capi/providers/openstack.html#building-images)
+### Building [OpenStack Imange Template](https://image-builder.sigs.k8s.io/capi/providers/openstack.html#building-images)
 ```
 git clone https://github.com/kubernetes-sigs/image-builder.git
 cd image-builder/images/capi
@@ -83,7 +84,7 @@ make build-qemu-ubuntu-2004 | tee build-qemu-ubuntu-2004.txt
 make build-qemu-ubuntu-2204 | tee build-qemu-ubuntu-2204.txt
 ```
 
-Upload Image to OpenStack Glance
+### Upload Image to OpenStack Glance
 
 Image locate in /root/image-builder/images/capi/output/BUILD_NAME-kube-KUBERNETES_VERSION
 ```
@@ -184,34 +185,36 @@ openstackmachinetemplate.infrastructure.cluster.x-k8s.io/demo-cluster-md-0 creat
 ```
 
 `Verification`
-
 ```
 kubectl get openstackcluster
 NAME           CLUSTER        READY   NETWORK                                BASTION IP   AGE
 demo-cluster   demo-cluster   true    c710af8b-6472-431a-90c9-31e5a8f2ddf8                5m47s
 
+
 kubectl describe osc demo-cluster
 ```
 
-
-kubectl get kubeadmcontrolplane
 ```
+kubectl get kubeadmcontrolplane
+
 NAME                         CLUSTER        INITIALIZED   API SERVER AVAILABLE   REPLICAS   READY   UPDATED   UNAVAILABLE   AGE     VERSION
 demo-cluster-control-plane   demo-cluster   true                                 1                  1         1             8m14s   v1.28.9
 ```
-kubectl get md
+
 ```
+kubectl get md
 NAME                CLUSTER        REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE     VERSION
 demo-cluster-md-0   demo-cluster   3                  3         3             ScalingUp   8m42s   v1.28.9
 ```
 
-kubectl get ms
 ```
+kubectl get ms
 NAME                      CLUSTER        REPLICAS   READY   AVAILABLE   AGE     VERSION
 demo-cluster-md-0-ptd7q   demo-cluster   3                              9m30s   v1.28.9
 ```
-kubectl get ma
+
 ```
+kubectl get ma
 NAME                               CLUSTER        NODENAME                           PROVIDERID                                          PHASE     AGE     VERSION
 demo-cluster-control-plane-hhx8k   demo-cluster   demo-cluster-control-plane-hhx8k   openstack:///4bdb1946-eba7-44ed-a0a5-6a787c666c21   Running   6m56s   v1.28.9
 demo-cluster-md-0-ptd7q-5w8fn      demo-cluster   demo-cluster-md-0-ptd7q-5w8fn      openstack:///d616537d-9a8f-4f18-ae79-801a879b6cde   Running   9m51s   v1.28.9
@@ -224,7 +227,7 @@ Get Kubeconfig:
 clusterctl get kubeconfig demo-cluster > demo-cluster.kubeconfig
 ```
 
-Operation
+`Operation`
 ```
 kubectl --kubeconfig=demo-cluster.kubeconfig get nodes
 NAME                               STATUS     ROLES           AGE     VERSION
@@ -296,7 +299,7 @@ serviceaccount/cloud-controller-manager created
 daemonset.apps/openstack-cloud-controller-manager created
 ```
 
-Deploy CNI
+#### Deploy CNI
 ```
 kubectl --kubeconfig=demo-cluster.kubeconfig apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
 
