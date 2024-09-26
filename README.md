@@ -1,4 +1,5 @@
-# Cluster API Provider OpenStack
+# [Cluster API Provider OpenStack](https://github.com/kubernetes-sigs/cluster-api-provider-openstack)
+
 ## Establishing the [Kubernetes Cluster for Management Cluster using RKE1](https://rke.docs.rancher.com/installation)
 Create 3 VM, Master node, Worker node, and Image Builder in OpenStack. <br/>
 ### Install Docker in Master & Worker:
@@ -84,7 +85,7 @@ make build-qemu-ubuntu-2004 | tee build-qemu-ubuntu-2004.txt
 make build-qemu-ubuntu-2204 | tee build-qemu-ubuntu-2204.txt
 ```
 
-### Upload Image to OpenStack Glance
+### Upload Image to [OpenStack Glance](https://docs.openstack.org/glance/latest/admin/manage-images.html)
 
 Image locate in /root/image-builder/images/capi/output/BUILD_NAME-kube-KUBERNETES_VERSION
 ```
